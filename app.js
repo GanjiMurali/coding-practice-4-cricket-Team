@@ -83,9 +83,10 @@ app.put("/players/:playerId/", async (request, response) => {
   const { playerId } = request.params;
   const playerDetails = request.body;
   const { playerName, jerseyNumber, role } = playerDetails;
-  const updatePlayerQuery = `UPDATE cricket_team SET player_name = '${playerName}', jersey_name = ${jerseyNumber}, role = '${role}' WHERE player_id = ${playerId}`;
-  await db.run(updatePlayerQuery);
+  const updatePlayerQuery = `UPDATE cricket_team SET player_name = '${playerName}', jersey_number = ${jerseyNumber}, role = '${role}' WHERE player_id = ${playerId};`;
+  dbResponse = await db.run(updatePlayerQuery);
   response.send("Player Details Updated");
+  //console.log(dbResponse);
 });
 
 module.exports = app;
