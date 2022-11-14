@@ -25,14 +25,30 @@ const initializeDBAndserver = async () => {
 
 initializeDBAndserver();
 
-//GET players API
+//1) GET players API
 app.get("/players/", async (request, response) => {
   const playersQuery = `SELECT * FROM cricket_team`;
   const playersArray = await db.all(playersQuery);
-  response.send(playersArray);
+
+  const convertDbObjectToResponseObject = (dbObject) => {
+    return {
+      playerId: dbObject.player_id,
+      playerName: dbObject.player_name,
+      jerseyNumber: dbObject.jersey_number,
+      role: dbObject.role,
+    };
+  };
+  let newArray = [];
+  for (let player of playersArray) {
+    let players = convertDbObjectToResponseObject(player);
+    newArray.push(players);
+    //console.log(players);
+  }
+  response.send(newArray);
+  //console.log(playersArray);
 });
 
-//POST player API
+//2) POST player API
 app.post("/players/", async (request, response) => {
   const playerDetails = request.body;
   const { playerName, jerseyNumber, role } = playerDetails;
@@ -42,12 +58,34 @@ app.post("/players/", async (request, response) => {
   response.send("Player Added to Team");
 });
 
-//GET player Details With ID
+//3) GET player Details With ID
 app.get("/players/:playerId/", async (request, response) => {
   const { playerId } = request.params;
   const playersIdQuery = `SELECT * FROM cricket_team WHERE player_id = ${playerId}`;
   const player = await db.get(playersIdQuery);
-  response.send(player);
+
+  const convertDbObjectToResponseObject = (dbObject) => {
+    return {
+      playerId: dbObject.player_id,
+      playerName: dbObject.player_name,
+      jerseyNumber: dbObject.jersey_number,
+      role: dbObject.role,
+    };
+  };
+
+  let playerDetailsWithId = convertDbObjectToResponseObject(player);
+
+  response.send(playerDetailsWithId);
+});
+
+//4) PUT update Player Details
+app.put("/players/:playerId/", async (request, response) => {
+  const { playerId } = request.params;
+  const playerDetails = request.body;
+  const { playerName, jerseyNumber, role } = playerDetails;
+  const updatePlayerQuery = `UPDATE cricket_team SET player_name = '${playerName}', jersey_name = ${jerseyNumber}, role = '${role}' WHERE player_id = ${playerId}`;
+  await db.run(updatePlayerQuery);
+  response.send("Player Details Updated");
 });
 
 module.exports = app;
