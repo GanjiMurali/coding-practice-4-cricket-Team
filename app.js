@@ -42,4 +42,12 @@ app.post("/players/", async (request, response) => {
   response.send("Player Added to Team");
 });
 
+//GET player Details With ID
+app.get("/players/:playerId/", async (request, response) => {
+  const { playerId } = request.params;
+  const playersIdQuery = `SELECT * FROM cricket_team WHERE player_id = ${playerId}`;
+  const player = await db.get(playersIdQuery);
+  response.send(player);
+});
+
 module.exports = app;
